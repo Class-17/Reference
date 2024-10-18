@@ -1,4 +1,4 @@
-template <int m>
+template<int m>
 class Modint {
 private:
     unsigned int _v;
@@ -12,7 +12,7 @@ public:
     }
 
     Modint() : _v(0) {}
-    template <class T>
+    template<class T>
     Modint(T v) {
         long long x = (long long)(v % (long long)(umod()));
         if (x < 0) x += umod();

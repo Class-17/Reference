@@ -1,73 +1,73 @@
 template <int m>
-class Mint {
+class Modint {
 private:
     unsigned int _v;
     static constexpr unsigned int umod() {return m;}
 public:
     static constexpr int mod() {return m;}
-    static Mint raw(int v) {
-        Mint x;
+    static Modint raw(int v) {
+        Modint x;
         x._v = v;
         return x;
     }
 
-    Mint() : _v(0) {}
+    Modint() : _v(0) {}
     template <class T>
-    Mint(T v) {
+    Modint(T v) {
         long long x = (long long)(v % (long long)(umod()));
         if (x < 0) x += umod();
         _v = (unsigned int)(x);
     }
 
-    Mint(bool v) {_v = ((unsigned int)(v) % umod());}
+    Modint(bool v) {_v = ((unsigned int)(v) % umod());}
 
     unsigned int val() const {return _v;}
 
-    Mint& operator++() {
+    Modint& operator++() {
         _v++;
         if (_v == umod()) _v = 0;
         return *this;
     }
-    Mint& operator--() {
+    Modint& operator--() {
         if (_v == 0) _v = umod();
         _v--;
         return *this;
     }
-    Mint operator++(int) {
-        Mint result = *this;
+    Modint operator++(int) {
+        Modint result = *this;
         ++*this;
         return result;
     }
-    Mint operator--(int) {
-        Mint result = *this;
+    Modint operator--(int) {
+        Modint result = *this;
         --*this;
         return result;
     }
 
-    Mint& operator+=(const Mint& rhs) {
+    Modint& operator+=(const Modint& rhs) {
         _v += rhs._v;
         if (_v >= umod()) _v -= umod();
         return *this;
     }
-    Mint& operator-=(const Mint& rhs) {
+    Modint& operator-=(const Modint& rhs) {
         _v -= rhs._v;
         if (_v >= umod()) _v += umod();
         return *this;
     }
-    Mint& operator*=(const Mint& rhs) {
+    Modint& operator*=(const Modint& rhs) {
         unsigned long long z = _v;
         z *= rhs._v;
         _v = (unsigned int)(z % umod());
         return *this;
     }
-    Mint& operator/=(const Mint& rhs) {return *this = *this * rhs.inv();}
+    Modint& operator/=(const Modint& rhs) {return *this = *this * rhs.inv();}
 
-    Mint operator+() const {return *this;}
-    Mint operator-() const {return Mint() - *this;}
+    Modint operator+() const {return *this;}
+    Modint operator-() const {return Modint() - *this;}
 
-    Mint pow(long long n) const {
+    Modint pow(long long n) const {
         assert(0 <= n);
-        Mint x = *this, r = 1;
+        Modint x = *this, r = 1;
         while (n) {
             if (n & 1) r *= x;
             x *= x;
@@ -75,27 +75,27 @@ public:
         }
         return r;
     }
-    Mint inv() const {
+    Modint inv() const {
         assert(_v);
         return pow(umod() - 2);
     }
 
-    friend Mint operator+(const Mint& lhs, const Mint& rhs) {
-        return Mint(lhs) += rhs;
+    friend Modint operator+(const Modint& lhs, const Modint& rhs) {
+        return Modint(lhs) += rhs;
     }
-    friend Mint operator-(const Mint& lhs, const Mint& rhs) {
-        return Mint(lhs) -= rhs;
+    friend Modint operator-(const Modint& lhs, const Modint& rhs) {
+        return Modint(lhs) -= rhs;
     }
-    friend Mint operator*(const Mint& lhs, const Mint& rhs) {
-        return Mint(lhs) *= rhs;
+    friend Modint operator*(const Modint& lhs, const Modint& rhs) {
+        return Modint(lhs) *= rhs;
     }
-    friend Mint operator/(const Mint& lhs, const Mint& rhs) {
-        return Mint(lhs) /= rhs;
+    friend Modint operator/(const Modint& lhs, const Modint& rhs) {
+        return Modint(lhs) /= rhs;
     }
-    friend bool operator==(const Mint& lhs, const Mint& rhs) {
+    friend bool operator==(const Modint& lhs, const Modint& rhs) {
         return lhs._v == rhs._v;
     }
-    friend bool operator!=(const Mint& lhs, const Mint& rhs) {
+    friend bool operator!=(const Modint& lhs, const Modint& rhs) {
         return lhs._v != rhs._v;
     }
 };

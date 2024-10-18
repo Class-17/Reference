@@ -72,7 +72,7 @@ public:
 				}
 				return l - size;
 			}
-			sm = (sm, d[l]);
+			sm = op(sm, d[l]);
 			l += 1;
 		} while ((l & -l) != l);
 		return n;

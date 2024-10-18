@@ -1,69 +1,63 @@
-template<class T>
+template<class T, auto op, auto e>
 class SegmentTree {
 private:
-    vector<T> val, lazy;
-    vector<int> L, R;
+    int n;
+    struct Node {
+        int l, r;
+        T dat;
+    };
+    std::vector<Node> t;
 
-    void update(int p) {
-        val[p] = val[p << 1] + val[p<<1|1];
-    }
+    void update(int k) {t[k].dat = op(t[k * 2].dat, t[k * 2 + 1].dat);}
 
-    void build(const vector<T> &arr, int p, int l, int r) {
-        tie(L[p], R[p]) = pair{l, r};
-        if (l == r) {val[p] = arr[l]; return;}
-        int mid = l + r >> 1;
-        build(arr, p << 1, l, mid);
-        build(arr, p<<1|1, mid + 1, r);
+    void change(int p, int x, T v) {
+        if (t[p].r - t[p].l == 1) {t[p].dat = v; return;}
+        int mid = t[p].l + t[p].r >> 1;
+        if (x < mid) change(p * 2, x, v);
+        else         change(p * 2 + 1, x, v);
         update(p);
-    }
+    };
 
-    void push_down(int p) {
-        if (!lazy[p]) return;
-        val[p << 1] += (R[p << 1] - L[p << 1] + 1) * lazy[p];
-        val[p<<1|1] += (R[p<<1|1] - L[p<<1|1] + 1) * lazy[p];
-        lazy[p << 1] += lazy[p];
-        lazy[p<<1|1] += lazy[p];
-        lazy[p] = 0;
+    T ask(int p, int l, int r) const {
+        if (l <= t[p].l and r >= t[p].r) return t[p].dat;
+        int mid = t[p].l + t[p].r >> 1;
+        T res = e();
+        if (l < mid) res = op(res, ask(p * 2, l, r));
+        if (r > mid) res = op(res, ask(p * 2 + 1, l, r));
+        return res;
     }
-
-    void add(int p, int l, int r, T delta) {
-        if (l <= L[p] and R[p] <= r) {
-            val[p] += (R[p] - L[p] + 1) * delta;
-            lazy[p] += delta;
-            return;
-        }
-        push_down(p);
-        int mid = L[p] + R[p] >> 1;
-        if (l <= mid) add(p << 1, l, r, delta);
-        if (r > mid)  add(p<<1|1, l, r, delta);
-        update(p);
-    }
-    
-    T ask(int p, int l, int r) {
-        if (r < L[p] or R[p] < l) return 0;
-        if (l <= L[p] and R[p] <= r) return val[p];
-        push_down(p);
-        return ask(p << 1, l, r) + ask(p<<1|1, l, r);
-    }
-
 public:
-    SegmentTree(int n = 0) {
-        val = lazy = vector<T>(n + 1 << 2);
-        L = R = vector<int>(n + 1 << 2);
+    SegmentTree() : SegmentTree(0) {}
+
+    SegmentTree(int n) : SegmentTree(std::vector<T>(n, e())) {}
+
+    SegmentTree(const std::vector<T> &v) : n(v.size()) {
+        t = std::vector<Node>(n * 4);
+        auto build = [&](auto &self, int p, int l, int r)->void {
+            t[p].l = l, t[p].r = r;
+            if (r - l == 1) {t[p].dat = v[l]; return;}
+            int mid = l + r >> 1;
+            self(self, p * 2, l, mid);
+            self(self, p * 2 + 1, mid, r);
+            update(p);
+        };
+        build(build, 1, 0, n);
     }
 
-    SegmentTree(const vector<T> &arr) {
-        int n = size(arr);
-        val = lazy = vector<T>(n << 2);
-        L = R = vector<int>(n << 2);
-        build(arr, 1, 1, n - 1);
+    void set(int p, T v) {
+        assert(0 <= p and p < n);
+        change(1, p, v);
     }
 
-    void add(int l, int r, T delta) {
-        add(1, l, r, delta);
+    T get(int p) const {
+        assert(0 <= p and p < n);
+        return ask(1, p, p + 1);
     }
 
-    T ask(int l, int r) {
+    T prod(int l, int r) const { // prod of [l, r)
+        assert(0 <= l and l <= r and r <= n);
         return ask(1, l, r);
     }
+
+    T all_prod() const {return t[1].dat;}
 };
